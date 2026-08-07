@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>B 站创作者运营 · 进线打标 & 总结 Agent 原型</title>
+<style>
+  :root{
+    --pink:#FB7299; --blue:#23ADE5; --ink:#222; --sub:#666; --line:#eee;
+    --bg:#fafbfc; --card:#fff; --ok:#2ecc71; --bad:#e74c3c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(120deg,var(--pink),var(--blue));color:#fff;padding:22px 28px;}
+  header h1{margin:0;font-size:20px;}
+  header p{margin:6px 0 0;opacity:.92;font-size:13px;}
+  .wrap{max-width:980px;margin:0 auto;padding:20px 18px 60px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+  .card h2{margin:0 0 10px;font-size:15px;color:var(--pink);display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:"";width:4px;height:16px;background:var(--pink);border-radius:2px;}
+  textarea{width:100%;min-height:76px;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;resize:vertical;font-family:inherit;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+  button{background:var(--pink);color:#fff;border:0;border-radius:8px;padding:9px 16px;font-size:14px;cursor:pointer;}
+  button.alt{background:#fff;color:var(--pink);border:1px solid var(--pink);}
+  button.ghost{background:#f2f3f5;color:var(--sub);}
+  .sample-btn{background:#f2f3f5;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:12px;cursor:pointer;}
+  label{font-size:13px;color:var(--sub);}
+  select{padding:7px 10px;border-radius:8px;border:1px solid var(--line);font-size:13px;}
+  .tag-pill{display:inline-block;background:#fff0f5;border:1px solid var(--pink);color:var(--pink);border-radius:20px;padding:5px 14px;font-weight:bold;font-size:14px;}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line);}
+  .kv span{color:var(--sub);}
+  .bars{margin-top:8px;}
+  .bar-row{display:flex;align-items:center;gap:8px;font-size:12px;margin:3px 0;}
+  .bar-name{width:90px;color:var(--sub);}
+  .bar-track{flex:1;background:#f2f3f5;border-radius:6px;height:10px;overflow:hidden;}
+  .bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--blue));}
+  .bar-val{width:24px;text-align:right;color:var(--sub);}
+  .sum-row{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+  .sum-k{width:84px;color:var(--sub);flex:none;}
+  .sum-v{flex:1;line-height:1.5;}
+  .metrics{display:flex;gap:12px;flex-wrap:wrap;}
+  .metric{flex:1;min-width:140px;background:#fff7fb;border:1px solid #ffd9e6;border-radius:10px;padding:14px;text-align:center;}
+  .m-num{font-size:26px;font-weight:bold;color:var(--pink);}
+  .m-label{font-size:12px;color:var(--sub);margin-top:4px;}
+  table.eval{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
+  table.eval th,table.eval td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top;}
+  table.eval th{background:#fafafa;color:var(--sub);}
+  table.eval tr.pass td:last-child{color:var(--ok);}
+  table.eval tr.fail td:last-child{color:var(--bad);font-weight:bold;}
+  .t-text{max-width:300px;}
+  .bc-item{border:1px solid #ffe0e0;background:#fff6f6;border-radius:10px;padding:10px 12px;margin-top:8px;}
+  .bc-head{font-size:12px;color:var(--bad);font-weight:bold;}
+  .bc-text{font-size:13px;margin:4px 0;}
+  .bc-map{font-size:13px;}
+  .bc-fix{font-size:12.5px;color:var(--sub);margin-top:4px;background:#fff;padding:6px 8px;border-radius:6px;}
+  .empty{color:var(--sub);font-size:13px;}
+  .note{font-size:12px;color:var(--sub);line-height:1.6;}
+  .tag-cloud{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .chip{background:#f2f3f5;border-radius:14px;padding:4px 10px;font-size:12px;color:var(--ink);}
+  code{background:#f2f3f5;padding:1px 5px;border-radius:4px;font-size:12px;}
+  .rt-group{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;}
+  .rt-group.pass{border-color:#cdeccd;background:#f4fcf5;}
+  .rt-group.fail{border-color:#ffd0d0;background:#fff6f6;}
+  .rt-head{font-size:13px;font-weight:bold;margin-bottom:6px;}
+  .rt-group.pass .rt-head{color:var(--ok);}
+  .rt-group.fail .rt-head{color:var(--bad);}
+</style>
+</head>
+<body>
+<header>
+  <h1>🅑 B 站创作者运营 · 进线打标 &amp; 总结 Agent 原型</h1>
+  <p>面向「创作服务 AI 提效」场景：知识库检索 + 进线打标 + 结构化总结 + Golden Set 评测 + Badcase 闭环</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 知识库 -->
+  <div class="card">
+    <h2>① 运营域结构化知识库（标签体系 / FAQ / 维护口径）</h2>
+    <div class="tag-cloud" id="labelCloud"></div>
+    <p class="note" id="caliberNote" style="margin-top:10px;"></p>
+  </div>
+
+  <!-- 打标 + 总结 -->
+  <div class="card">
+    <h2>② 进线打标 + 结构化总结（Agent）</h2>
+    <div class="row" style="margin-bottom:10px;">
+      <label>运行模式：</label>
+      <select id="modeSel">
+        <option value="rule">规则基线（零依赖 · 双击即用）</option>
+        <option value="rag">RAG Agent（智能模式 · 检索+大模型）</option>
+      </select>
+      <span id="modeNote" class="note">当前为 <b>规则基线</b>：关键词打分 + FAQ 检索加权，零依赖、可直接双击 index.html 运行。</span>
+    </div>
+    <textarea id="inputText" placeholder="粘贴一条创作者运营进线内容，例如：我的视频被限流了，是不是被搬运举报，怎么申诉恢复？"></textarea>
+    <div class="row">
+      <span class="note">示例：</span>
+      <span id="samples"></span>
+    </div>
+    <div class="row">
+      <button id="btnClassify">运行打标 + 总结</button>
+    </div>
+    <div id="classifyPanel" style="display:none;margin-top:12px;">
+      <div id="tagResult"></div>
+      <h2 style="margin-top:14px;">进线总结</h2>
+      <div id="summaryResult"></div>
+      <h2 style="margin-top:14px;">RAG 检索召回 &amp; 分类依据</h2>
+      <div id="ragContext"></div>
+      <div id="ragReason"></div>
+    </div>
+  </div>
+
+  <!-- Badcase -->
+  <div class="card">
+    <h2>③ Badcase 闭环（人工标注 → 知识库迭代建议）</h2>
+    <div class="row">
+      <label>人工正确标签：</label>
+      <select id="expectedSel"></select>
+      <button class="alt" id="btnBadcase">标记当前为 Badcase</button>
+    </div>
+    <div id="badcaseList" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- 评测 -->
+  <div class="card">
+    <h2>④ Golden Set 评测集（检索命中率 / 打标准确率）</h2>
+    <div class="row">
+      <button id="btnEval">运行 Golden Set 评测</button>
+      <span class="note">对 <code>data.js</code> 中带标注的样例批量评测，量化 Agent 打标准确性。</span>
+    </div>
+    <div id="evalPanel" style="display:none;margin-top:12px;">
+      <div class="metrics" id="metrics"></div>
+      <div id="evalTable" style="margin-top:12px;overflow-x:auto;"></div>
+    </div>
+  </div>
+
+  <!-- 跨业务场景路由一致性 -->
+  <div class="card">
+    <h2>⑤ 跨业务场景路由一致性专项评测</h2>
+    <div class="row">
+      <button id="btnRouting">运行路由一致性评测</button>
+      <span class="note">监控「同一业务诉求在不同场景/视角/表述下」是否稳定路由到同一标签，覆盖 JD 中「跨业务场景路由一致性」要求。</span>
+    </div>
+    <div id="routingPanel" style="display:none;margin-top:12px;">
+      <div class="metrics" id="routingMetrics"></div>
+      <div id="routingNote" style="margin-top:10px;"></div>
+      <div id="routingGroups" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <p class="note">
+    本原型为 vibe coding 快速搭建的演示版：默认分类采用「关键词打分 + FAQ 检索召回加权」的确定性基线；
+    切换到 <b>RAG Agent（智能模式）</b> 后将知识库检索切片送入大模型生成打标 + 总结。
+    真实生产可进一步升级为 RAG + 微调分类头。所有逻辑见 <code>app.js</code>，知识库与评测集见 <code>data.js</code>，大模型代理见 <code>server.js</code>。
+  </p>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+  // 渲染标签云与维护口径
+  (function(){
+    var cloud=document.getElementById('labelCloud');
+    DATA.labels.forEach(function(l){
+      var s=document.createElement('span'); s.className='chip'; s.textContent=l.name; cloud.appendChild(s);
+    });
+    document.getElementById('caliberNote').innerHTML='<b>维护口径：</b><br>'+DATA.caliber.map(function(c){return '· '+c;}).join('<br>');
+  })();
+</script>
+</body>
+</html>
