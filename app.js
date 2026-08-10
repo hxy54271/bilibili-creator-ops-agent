@@ -284,12 +284,19 @@ if (typeof document !== "undefined") {
       renderRagReason(r);
       window.__last = { predicted: r.predicted, labelName: r.labelName };
     } catch (e) {
-      // 服务未启动 → 提示并自动回退规则基线，保证可用
-      $("tagResult").innerHTML = `<p class="note" style="color:#d97706;">⚠️ RAG 模式需要本地服务：在终端运行 <code>node server.js</code> 后访问 http://localhost:3000 。已自动回退到规则基线演示。</p>`;
+      // 服务未启动（如静态托管 / GitHub Pages）→ 离线模拟 RAG，明确标注为演示模式，保证可交互演示
       const r = classify(text);
-      $("summaryResult").innerHTML = renderSummary(r);
-      $("ragContext").innerHTML = ""; $("ragReason").innerHTML = "";
-      window.__last = r;
+      const rc = retrieveContext(text, 6);
+      const mock = Object.assign({}, r, {
+        retrieved: rc.sources,
+        reason: `（离线模拟）检索召回 ${rc.sources.length} 条知识切片，其中匹配「${r.labelName}」标签关键词权重最高，故判定为该标签；核心诉求：${r.summary.核心诉求 || "—"}。`,
+        mode: "mock",
+      });
+      $("tagResult").innerHTML = renderTagResult(mock);
+      $("summaryResult").innerHTML = renderSummary(mock);
+      renderRagContext(mock);
+      renderRagReason(mock);
+      window.__last = { predicted: mock.predicted, labelName: mock.labelName };
     }
   }
 
